@@ -1,0 +1,9 @@
+{
+    "name" : "j3dconv",
+    "version-string" : "j3dconv-win",
+    "dependencies": [
+        "zlib",
+        "libpng",
+        "freeglut"
+    ]
+}
