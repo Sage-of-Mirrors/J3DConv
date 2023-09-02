@@ -60,18 +60,12 @@ void J3D::Cnv::UConverterVertexData::BuildConverterPrimitive(const std::map<EGXA
         }
 
         // Record vertex weight information for later
-        cnvVertex->JointIndices = {
-            static_cast<uint32_t>(jointIndices[vertexIndex].x),
-            static_cast<uint32_t>(jointIndices[vertexIndex].y),
-            static_cast<uint32_t>(jointIndices[vertexIndex].z),
-            static_cast<uint32_t>(jointIndices[vertexIndex].w),
-        };
-        cnvVertex->Weights = {
-            jointWeights[vertexIndex].x,
-            jointWeights[vertexIndex].y,
-            jointWeights[vertexIndex].z,
-            jointWeights[vertexIndex].w,
-        };
+        for (uint32_t j = 0; j < 4; j++) {
+            if (jointWeights[vertexIndex][j] != 0.0f) {
+                cnvVertex->JointIndices.push_back(jointIndices[vertexIndex][j]);
+                cnvVertex->Weights.push_back(jointWeights[vertexIndex][j]);
+            }
+        }
 
         // Strip vertex attributes to only unique values, and set the vertex indices to match
         for (const auto& [attribute, values] : attributes) {
@@ -303,7 +297,6 @@ void J3D::Cnv::UConverterVertexData::WriteVTX1(bStream::CStream& stream) {
     // Write section size
     stream.seek(streamStartPos + 4);
     stream.writeUInt32(static_cast<uint32_t>(streamEndPos - streamStartPos));
-    
     stream.seek(streamEndPos);
 }
 

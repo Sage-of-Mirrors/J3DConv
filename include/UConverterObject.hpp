@@ -2,6 +2,7 @@
 
 #include "types.hpp"
 #include "UConverterVertexData.hpp"
+#include "UConverterEnvelopeData.hpp"
 #include "UConverterMesh.hpp"
 
 #include <vector>
@@ -22,6 +23,7 @@ namespace J3D {
             std::vector<bStream::CMemoryStream> mBufferStreams;
 
             UConverterVertexData mVertexData;
+            UConverterEnvelopeData mEnvelopeData;
             std::vector<UConverterMesh*> mMeshes;
 
             void WriteJNT1(bStream::CStream& stream, tinygltf::Model* model);

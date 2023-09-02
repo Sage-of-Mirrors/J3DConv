@@ -37,7 +37,7 @@ namespace J3D {
 
             uint16_t PosMatrixIndex = UINT16_MAX;
 
-            std::vector<uint32_t> JointIndices;
+            std::vector<uint16_t> JointIndices;
             std::vector<float> Weights;
 
             void SetIndex(EGXAttribute attribute, uint16_t index);
@@ -60,6 +60,7 @@ namespace J3D {
             ~UConverterMesh();
 
             void AddPrimitive(UConverterPrimitive* prim) { if (prim != nullptr) mPrimitives.push_back(prim); }
+            std::vector<UConverterPrimitive*>& GetPrimitives() { return mPrimitives; }
         };
     }
 }

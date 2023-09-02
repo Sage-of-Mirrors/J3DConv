@@ -400,6 +400,7 @@ void J3D::Cnv::UConverterObject::BuildVertexData(tinygltf::Model* model) {
 bool J3D::Cnv::UConverterObject::Load(tinygltf::Model* model) {
     LoadBuffers(model);
     BuildVertexData(model);
+    mEnvelopeData.ProcessEnvelopes(mMeshes);
 
     uint32_t sceneRootNodeIndex = model->scenes[model->defaultScene].nodes[0];
     auto& sceneRootNode = model->nodes[sceneRootNodeIndex];
@@ -417,8 +418,8 @@ bool J3D::Cnv::UConverterObject::Load(tinygltf::Model* model) {
 
     //WriteINF1();
     mVertexData.WriteVTX1(f);
-    //WriteEVP1();
-    //WriteDRW1();
+    mEnvelopeData.WriteEVP1(f);
+    mEnvelopeData.WriteDRW1(f);
 
     //WriteJNT1(f, model);
     

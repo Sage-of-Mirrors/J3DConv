@@ -5,7 +5,7 @@
 
 #include <bstream.h>
 
-const std::string PADDING_STRING = "This is padding data to alig";
+const std::string PADDING_STRING = "This is padding data to align ";
 
 std::string J3DUtility::LoadTextFile(std::filesystem::path filePath) {
 	if (filePath.empty() || !std::filesystem::exists(filePath))
