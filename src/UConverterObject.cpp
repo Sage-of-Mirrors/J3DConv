@@ -20,11 +20,6 @@ J3D::Cnv::UConverterObject::~UConverterObject() {
         delete[] buffer;
     }
     mBuffers.clear();
-
-    for (UConverterMesh* mesh : mMeshes) {
-        delete mesh;
-    }
-    mMeshes.clear();
 }
 
 void J3D::Cnv::UConverterObject::WriteTEX1(bStream::CStream& stream, tinygltf::Model* model) {
@@ -69,6 +64,7 @@ bool J3D::Cnv::UConverterObject::Load(tinygltf::Model* model) {
     mSkeletonData.BuildSkeleton(model);
     
     mShapeData.BuildVertexData(model, &mVertexData, mBufferStreams);
+    mSkeletonData.AttachShapesToSkeleton(mShapeData.GetShapes());
 
     mEnvelopeData.ProcessEnvelopes(mShapeData.GetShapes());
     mEnvelopeData.ReadInverseBindMatrices(model, mBufferStreams);

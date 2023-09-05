@@ -1,5 +1,4 @@
 #include "J3DConv.hpp"
-#include "J3DVertexData.hpp"
 #include "UConverterObject.hpp"
 
 #include <bstream.h>

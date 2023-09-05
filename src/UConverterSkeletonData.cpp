@@ -1,25 +1,61 @@
 #include "UConverterSkeletonData.hpp"
+#include "UConverterShapeData.hpp"
 #include "J3DNameTable.hpp"
 #include "J3DUtil.hpp"
 
 #include <bstream.h>
 #include <tiny_gltf.h>
 
+#include <algorithm>
+
 const float INT16_RAD_ANGLE_RATIO = 32768.0f / glm::pi<float>();
 
 /* UConverterJoint */
 
 void J3D::Cnv::UConverterJoint::WriteHierarchyRecursive(bStream::CStream& stream) {
-    stream.writeUInt16(0x10);
+    stream.writeUInt16(static_cast<uint16_t>(EHierarchyNodeType::Joint));
     stream.writeUInt16(JointIndex);
 
-    for (UConverterJoint* j : Children) {
-        stream.writeUInt16(1);
+    if (AttachedShapes.size() != 0) {
+        // Sort shapes by material name, ascending alphabetically
+        std::sort(
+            AttachedShapes.begin(),
+            AttachedShapes.end(),
+            [](const UConverterShape* a, const UConverterShape* b) {
+                return a->GetMaterialName() < b->GetMaterialName();
+            }
+        );
+
+        for (const UConverterShape* s : AttachedShapes) {
+            stream.writeUInt16(static_cast<uint16_t>(EHierarchyNodeType::Down));
+            stream.writeUInt16(0);
+
+            stream.writeUInt16(static_cast<uint16_t>(EHierarchyNodeType::Material));
+            stream.writeUInt16(s->GetMaterialIndex());
+
+            stream.writeUInt16(static_cast<uint16_t>(EHierarchyNodeType::Down));
+            stream.writeUInt16(0);
+
+            stream.writeUInt16(static_cast<uint16_t>(EHierarchyNodeType::Shape));
+            stream.writeUInt16(s->GetIndex());
+        }
+    }
+
+    if (Children.size() != 0) {
+        stream.writeUInt16(static_cast<uint16_t>(EHierarchyNodeType::Down));
         stream.writeUInt16(0);
 
-        j->WriteHierarchyRecursive(stream);
+        for (UConverterJoint* j : Children) {
+            j->WriteHierarchyRecursive(stream);
+        }
 
-        stream.writeUInt16(2);
+        stream.writeUInt16(static_cast<uint16_t>(EHierarchyNodeType::Up));
+        stream.writeUInt16(0);
+    }
+
+    // We wrote 2 "down"s for each attached shape, so write as many "up"s.
+    for (uint32_t i = 0; i < AttachedShapes.size() * 2; i++) {
+        stream.writeUInt16(static_cast<uint16_t>(EHierarchyNodeType::Up));
         stream.writeUInt16(0);
     }
 }
@@ -165,6 +201,12 @@ void J3D::Cnv::UConverterSkeletonData::BuildSkeleton(tinygltf::Model* model) {
     }
     else {
         CreateSkeleton(model);
+    }
+}
+
+void J3D::Cnv::UConverterSkeletonData::AttachShapesToSkeleton(std::vector<UConverterShape*> shapes) {
+    for (UConverterShape* s : shapes) {
+        mJoints[s->GetJointIndex()]->AttachedShapes.push_back(s);
     }
 }
 

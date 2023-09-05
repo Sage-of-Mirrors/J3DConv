@@ -1,5 +1,5 @@
 #include "UConverterEnvelopeData.hpp"
-#include "UConverterMesh.hpp"
+#include "UConverterShapeData.hpp"
 #include "J3DUtil.hpp"
 
 #include <bstream.h>
@@ -14,10 +14,10 @@ J3D::Cnv::UConverterEnvelopeData::~UConverterEnvelopeData() {
 
 }
 
-void J3D::Cnv::UConverterEnvelopeData::ProcessEnvelopes(const std::vector<UConverterMesh*>& meshes) {
+void J3D::Cnv::UConverterEnvelopeData::ProcessEnvelopes(const std::vector<UConverterShape*>& shapes) {
     // Fill unskinned indices first
-    for (UConverterMesh* mesh : meshes) {
-        for (UConverterPrimitive* prim : mesh->GetPrimitives()) {
+    for (UConverterShape* shape : shapes) {
+        for (UConverterPrimitive* prim : shape->GetPrimitives()) {
             for (UConverterVertex* v : prim->mVertices) {
                 if (v->JointIndices.size() == 1) {
                     uint16_t jointIndex = UINT16_MAX;
@@ -38,8 +38,8 @@ void J3D::Cnv::UConverterEnvelopeData::ProcessEnvelopes(const std::vector<UConve
     }
 
     // Fill skinned indices next
-    for (UConverterMesh* mesh : meshes) {
-        for (UConverterPrimitive* prim : mesh->GetPrimitives()) {
+    for (UConverterShape* shape : shapes) {
+        for (UConverterPrimitive* prim : shape->GetPrimitives()) {
             for (UConverterVertex* v : prim->mVertices) {
                 if (v->JointIndices.size() != 1) {
                     UConverterEnvelope env = { v->JointIndices, v->Weights };

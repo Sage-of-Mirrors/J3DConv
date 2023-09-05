@@ -17,6 +17,15 @@ namespace J3D {
     namespace Cnv {
         class UConverterShape;
 
+        enum class EHierarchyNodeType {
+            End = 0,
+            Down = 1,
+            Up = 2,
+            Joint = 0x10,
+            Material = 0x11,
+            Shape = 0x12
+        };
+
         struct UConverterJoint {
             std::string Name = "";
 
@@ -60,11 +69,7 @@ namespace J3D {
             void WriteINF1(bStream::CStream& stream, uint32_t vertexCount);
             void WriteJNT1(bStream::CStream& stream);
 
-            void AttachShapeToJoint(UConverterShape* shape, uint32_t jointIndex) {
-                if (jointIndex < mJoints.size()) {
-                    mJoints[jointIndex]->AttachedShapes.push_back(shape);
-                }
-            }
+            void AttachShapesToSkeleton(std::vector<UConverterShape*> shapes);
         };
     }
 }

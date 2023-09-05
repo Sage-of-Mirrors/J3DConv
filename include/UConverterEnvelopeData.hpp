@@ -17,7 +17,7 @@ namespace tinygltf {
 
 namespace J3D {
     namespace Cnv {
-        class UConverterMesh;
+        class UConverterShape;
 
         struct UConverterEnvelope {
             std::vector<uint16_t> JointIndices;
@@ -45,7 +45,7 @@ namespace J3D {
             UConverterEnvelopeData();
             ~UConverterEnvelopeData();
 
-            void ProcessEnvelopes(const std::vector<UConverterMesh*>& meshes);
+            void ProcessEnvelopes(const std::vector<UConverterShape*>& shapes);
             void ReadInverseBindMatrices(const tinygltf::Model* model, std::vector<bStream::CMemoryStream>& buffers);
 
             void WriteEVP1(bStream::CStream& stream);

@@ -229,9 +229,13 @@ void J3D::Cnv::UConverterShapeData::ReadGltfIndices(
 
 void J3D::Cnv::UConverterShapeData::BuildVertexData(tinygltf::Model* model, UConverterVertexData* vertexData, std::vector<bStream::CMemoryStream>& buffers) {
     for (const tinygltf::Mesh& mesh : model->meshes) {
-        UConverterMesh* cnvMesh = new UConverterMesh();
-
         for (const tinygltf::Primitive& prim : mesh.primitives) {
+            UConverterShape* shape = new UConverterShape();
+
+            shape->SetIndex(static_cast<uint32_t>(mShapes.size()));
+            shape->SetMaterialIndex(prim.material);
+            shape->SetMaterialName(model->materials[prim.material].name);
+
             // Read vertex indices
             std::vector<uint16_t> rawIndices;
             ReadGltfIndices(model, buffers, prim.indices, rawIndices);
@@ -266,47 +270,75 @@ void J3D::Cnv::UConverterShapeData::BuildVertexData(tinygltf::Model* model, UCon
 
             // Process index data and add vertex attributes to the vertex data arrays
             switch (prim.mode) {
-            case TINYGLTF_MODE_TRIANGLES:
-            {
-                triangle_stripper::indices indicesToStrip;
-                for (const uint16_t i : rawIndices) {
-                    indicesToStrip.push_back(static_cast<size_t>(i));
+                case TINYGLTF_MODE_TRIANGLES:
+                {
+                    triangle_stripper::indices indicesToStrip;
+                    for (const uint16_t i : rawIndices) {
+                        indicesToStrip.push_back(static_cast<size_t>(i));
+                    }
+
+                    triangle_stripper::tri_stripper stripper(indicesToStrip);
+
+                    triangle_stripper::primitive_vector strippedPrimitives;
+                    stripper.Strip(&strippedPrimitives);
+
+                    for (const auto& strip : strippedPrimitives) {
+                        UConverterPrimitive* cnvPrimitive = new UConverterPrimitive();
+                        cnvPrimitive->mPrimitiveType = EGXPrimitiveType::TriangleStrips;
+
+                        std::vector<uint16_t> strippedIndices;
+                        for (const triangle_stripper::index i : strip.Indices) {
+                            strippedIndices.push_back(static_cast<uint16_t>(i));
+                        }
+
+                        vertexData->BuildConverterPrimitive(primitiveAttributes, strippedIndices, jointIndices, weights, cnvPrimitive);
+                        shape->AddPrimitive(cnvPrimitive);
+                    }
+
+                    break;
                 }
-
-                triangle_stripper::tri_stripper stripper(indicesToStrip);
-
-                triangle_stripper::primitive_vector strippedPrimitives;
-                stripper.Strip(&strippedPrimitives);
-
-                for (const auto& strip : strippedPrimitives) {
+                // TODO: Add handling for other primitive types?
+                default:
+                {
                     UConverterPrimitive* cnvPrimitive = new UConverterPrimitive();
                     cnvPrimitive->mPrimitiveType = EGXPrimitiveType::TriangleStrips;
 
-                    std::vector<uint16_t> strippedIndices;
-                    for (const triangle_stripper::index i : strip.Indices) {
-                        strippedIndices.push_back(static_cast<uint16_t>(i));
-                    }
+                    vertexData->BuildConverterPrimitive(primitiveAttributes, rawIndices, jointIndices, weights, cnvPrimitive);
+                    shape->AddPrimitive(cnvPrimitive);
 
-                    vertexData->BuildConverterPrimitive(primitiveAttributes, strippedIndices, jointIndices, weights, cnvPrimitive);
-                    cnvMesh->AddPrimitive(cnvPrimitive);
+                    break;
                 }
-
-                break;
             }
-            // TODO: Add handling for other primitive types?
-            default:
-            {
-                UConverterPrimitive* cnvPrimitive = new UConverterPrimitive();
-                cnvPrimitive->mPrimitiveType = EGXPrimitiveType::TriangleStrips;
 
-                vertexData->BuildConverterPrimitive(primitiveAttributes, rawIndices, jointIndices, weights, cnvPrimitive);
-                cnvMesh->AddPrimitive(cnvPrimitive);
+            // If there is skinning info, analyze it to see which joint this shape belongs to.
+            uint32_t jointIndex = UINT32_MAX;
 
-                break;
+            if (jointIndices.size() != 0) {
+                for (uint32_t i = 0; i < jointIndices.size(); i++) {
+                    if (weights[i][0] < 1.0f) {
+                        jointIndex = 0;
+                        break;
+                    }
+                    else {
+                        if (jointIndex != UINT32_MAX) {
+                            if (jointIndex != jointIndices[i][0]) {
+                                jointIndex = 0;
+                                break;
+                            }
+                        }
+                        else {
+                            jointIndex = jointIndices[i][0];
+                        }
+                    }
+                }
             }
+            // Otherwise, just set its joint index to the root.
+            else {
+                jointIndex = 0;
             }
+
+            shape->SetJointIndex(jointIndex);
+            mShapes.push_back(shape);
         }
-
-        mMeshes.push_back(cnvMesh);
     }
 }
