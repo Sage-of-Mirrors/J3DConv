@@ -55,16 +55,21 @@ void J3D::Cnv::UConverterVertexData::BuildConverterPrimitive(const std::map<EGXA
         uint16_t vertexIndex = indices[i];
         UConverterVertex* cnvVertex = new UConverterVertex();
 
-        if (attributes.at(EGXAttribute::NBT).size() != 0) {
+        if (attributes.find(EGXAttribute::NBT) != attributes.end() && attributes.at(EGXAttribute::NBT).size() != 0) {
             cnvVertex->bUseNBT = true;
         }
 
-        // Record vertex weight information for later
-        for (uint32_t j = 0; j < 4; j++) {
-            if (jointWeights[vertexIndex][j] != 0.0f) {
-                cnvVertex->JointIndices.push_back(jointIndices[vertexIndex][j]);
-                cnvVertex->Weights.push_back(jointWeights[vertexIndex][j]);
+        if (jointIndices.size() != 0) {
+            for (uint32_t skinIndex = 0; skinIndex < 4; skinIndex++) {
+                if (jointWeights[vertexIndex][skinIndex] != 0.0f) {
+                    cnvVertex->JointIndices.push_back(jointIndices[vertexIndex][skinIndex]);
+                    cnvVertex->Weights.push_back(jointWeights[vertexIndex][skinIndex]);
+                }
             }
+        }
+        else {
+            cnvVertex->JointIndices.push_back(0);
+            cnvVertex->Weights.push_back(1.0f);
         }
 
         // Strip vertex attributes to only unique values, and set the vertex indices to match

@@ -5,7 +5,7 @@
 
 #include <bstream.h>
 
-const std::string PADDING_STRING = "This is padding data to align ";
+const std::string PADDING_STRING = "This is padding data to alignm";
 
 std::string J3DUtility::LoadTextFile(std::filesystem::path filePath) {
 	if (filePath.empty() || !std::filesystem::exists(filePath))
@@ -35,4 +35,12 @@ void J3DUtility::PadStreamWithString(bStream::CStream* stream, uint32_t padValue
 	for (int i = 0; i < delta; i++) {
 		stream->writeUInt8(paddingString[i % paddingString.size()]);
 	}
+}
+
+void J3DUtility::WriteOffset(bStream::CStream* stream, size_t relativeTo, uint32_t location) {
+	size_t currentStreamPos = stream->tell();
+
+	stream->seek(relativeTo + location);
+	stream->writeUInt32(static_cast<uint32_t>(currentStreamPos - relativeTo));
+	stream->seek(currentStreamPos);
 }

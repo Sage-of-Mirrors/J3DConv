@@ -47,4 +47,6 @@ namespace J3DUtility {
     std::string LoadTextFile(std::filesystem::path filePath);
 
     void PadStreamWithString(bStream::CStream* stream, uint32_t padValue, std::string str = "");
+
+    void WriteOffset(bStream::CStream* stream, size_t relativeTo, uint32_t location);
 }

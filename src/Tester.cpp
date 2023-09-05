@@ -2,17 +2,17 @@
 #include "J3DVertexData.hpp"
 #include "UConverterObject.hpp"
 
+#include <bstream.h>
 #include <tiny_gltf.h>
-
-#include <iostream>
 
 int main() {
     tinygltf::Model model;
 
-    J3D::Cnv::LoadGltf(&model, "D:\\SZS Tools\\J3DConv\\testspheres.glb");
+    J3D::Cnv::LoadGltf(&model, "D:\\SZS Tools\\J3DConv\\link.glb");
 
     J3D::Cnv::UConverterObject t;
     t.Load(&model);
 
-    //J3D::Cnv::SaveBMD(&model, "D:\\SZS Tools\\J3DConv\\testman_skinned.bmd");
+    bStream::CFileStream f("D:\\SZS Tools\\J3DConv\\test.bmd", bStream::Big, bStream::Out);
+    t.WriteBMD(f);
 }

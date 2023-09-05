@@ -3,7 +3,8 @@
 #include "types.hpp"
 #include "UConverterVertexData.hpp"
 #include "UConverterEnvelopeData.hpp"
-#include "UConverterMesh.hpp"
+#include "UConverterSkeletonData.hpp"
+#include "UConverterShapeData.hpp"
 
 #include <vector>
 
@@ -23,23 +24,20 @@ namespace J3D {
             std::vector<bStream::CMemoryStream> mBufferStreams;
 
             UConverterVertexData mVertexData;
+            UConverterSkeletonData mSkeletonData;
             UConverterEnvelopeData mEnvelopeData;
-            std::vector<UConverterMesh*> mMeshes;
+            UConverterShapeData mShapeData;
 
-            void WriteJNT1(bStream::CStream& stream, tinygltf::Model* model);
             void WriteTEX1(bStream::CStream& stream, tinygltf::Model* model);
 
             void LoadBuffers(tinygltf::Model* model);
-            void BuildVertexData(tinygltf::Model* model);
-
-            void ReadGltfVertexAttribute(const tinygltf::Model* model, uint32_t attributeAccessorIndex, std::vector<glm::vec4>& values);
-            void ReadGltfIndices(const tinygltf::Model* model, uint32_t indexAccessorIndex, std::vector<uint16_t>& indices);
 
         public:
             UConverterObject();
             ~UConverterObject();
 
             bool Load(tinygltf::Model* model);
+            bool WriteBMD(bStream::CStream& stream);
         };
     }
 }

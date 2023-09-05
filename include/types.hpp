@@ -1,5 +1,6 @@
 #pragma once;
 
+#include <glm/vec3.hpp>
 #include <cstdint>
 
 namespace bStream {
@@ -99,6 +100,13 @@ namespace J3D {
             Lines = 0xA8,
             LineStrips = 0xB0,
             Points = 0xB8
+        };
+
+        struct UConverterBoundingVolume {
+            float BoundingSphereRadius;
+
+            glm::vec3 BoundingBoxMin;
+            glm::vec3 BoundingBoxMax;
         };
     }
 }

@@ -7,6 +7,14 @@
 
 #include <vector>
 
+namespace bStream {
+    class CMemoryStream;
+}
+
+namespace tinygltf {
+    class Model;
+}
+
 namespace J3D {
     namespace Cnv {
         class UConverterMesh;
@@ -38,6 +46,7 @@ namespace J3D {
             ~UConverterEnvelopeData();
 
             void ProcessEnvelopes(const std::vector<UConverterMesh*>& meshes);
+            void ReadInverseBindMatrices(const tinygltf::Model* model, std::vector<bStream::CMemoryStream>& buffers);
 
             void WriteEVP1(bStream::CStream& stream);
             void WriteDRW1(bStream::CStream& stream);

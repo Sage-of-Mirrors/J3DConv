@@ -52,6 +52,8 @@ namespace J3D {
                                          UConverterPrimitive* primitive);
 
             void WriteVTX1(bStream::CStream& stream);
+
+            uint32_t GetVertexCount() const { return static_cast<uint32_t>(mVertexData.at(EGXAttribute::Position).size()); }
         };
     }
 }
