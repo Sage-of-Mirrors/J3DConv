@@ -3,8 +3,9 @@
 
 #include <tiny_gltf.h>
 #include <bstream.h>
-#include <glm/ext.hpp>
 #include <tri_stripper.h>
+#include <glm/ext.hpp>
+#include <glm/geometric.hpp>
 
 #include <algorithm>
 
@@ -79,6 +80,31 @@ J3D::Cnv::UConverterShape::~UConverterShape() {
         delete p;
     }
     mPrimitives.clear();
+}
+
+void J3D::Cnv::UConverterShape::CalculateBoundingVolume(const std::vector<glm::vec4>& positions) {
+    for (const glm::vec4& p : positions) {
+        if (p.x > mBounds.BoundingBoxMax.x) {
+            mBounds.BoundingBoxMax.x = p.x;
+        }
+        if (p.x < mBounds.BoundingBoxMin.x) {
+            mBounds.BoundingBoxMin.x = p.x;
+        }
+
+        if (p.y > mBounds.BoundingBoxMax.y) {
+            mBounds.BoundingBoxMax.y = p.y;
+        }
+        if (p.y < mBounds.BoundingBoxMin.y) {
+            mBounds.BoundingBoxMin.y = p.y;
+        }
+
+        if (p.z > mBounds.BoundingBoxMax.z) {
+            mBounds.BoundingBoxMax.z = p.z;
+        }
+        if (p.z < mBounds.BoundingBoxMin.z) {
+            mBounds.BoundingBoxMin.z = p.z;
+        }
+    }
 }
 
 /* UConverterShapeData */
@@ -267,6 +293,8 @@ void J3D::Cnv::UConverterShapeData::BuildVertexData(tinygltf::Model* model, UCon
                     std::cout << "Unknown glTF attribute \'" << name << "\'!" << std::endl;
                 }
             }
+
+            shape->CalculateBoundingVolume(primitiveAttributes.at(EGXAttribute::Position));
 
             // Process index data and add vertex attributes to the vertex data arrays
             switch (prim.mode) {

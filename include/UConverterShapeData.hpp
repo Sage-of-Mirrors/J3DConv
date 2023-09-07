@@ -76,6 +76,8 @@ namespace J3D {
             UConverterShape();
             ~UConverterShape();
 
+            void CalculateBoundingVolume(const std::vector<glm::vec4>& positions);
+
             void AddPrimitive(UConverterPrimitive* prim) { if (prim != nullptr) mPrimitives.push_back(prim); }
             std::vector<UConverterPrimitive*>& GetPrimitives() { return mPrimitives; }
 

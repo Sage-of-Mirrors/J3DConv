@@ -103,10 +103,10 @@ namespace J3D {
         };
 
         struct UConverterBoundingVolume {
-            float BoundingSphereRadius;
+            float BoundingSphereRadius = 0.0f;
 
-            glm::vec3 BoundingBoxMin;
-            glm::vec3 BoundingBoxMax;
+            glm::vec3 BoundingBoxMin = { FLT_MAX, FLT_MAX, FLT_MAX };
+            glm::vec3 BoundingBoxMax = { FLT_MIN, FLT_MIN, FLT_MIN };
         };
     }
 }
