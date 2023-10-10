@@ -1,5 +1,5 @@
 #include "UConverterVertexData.hpp"
-#include "UConverterMesh.hpp"
+#include "UConverterShapeData.hpp"
 #include "J3DUtil.hpp"
 
 #include <bstream.h>
@@ -62,14 +62,14 @@ void J3D::Cnv::UConverterVertexData::BuildConverterPrimitive(const std::map<EGXA
         if (jointIndices.size() != 0) {
             for (uint32_t skinIndex = 0; skinIndex < 4; skinIndex++) {
                 if (jointWeights[vertexIndex][skinIndex] != 0.0f) {
-                    cnvVertex->JointIndices.push_back(jointIndices[vertexIndex][skinIndex]);
-                    cnvVertex->Weights.push_back(jointWeights[vertexIndex][skinIndex]);
+                    cnvVertex->SkinInfo.JointIndices.push_back(jointIndices[vertexIndex][skinIndex]);
+                    cnvVertex->SkinInfo.Weights.push_back(jointWeights[vertexIndex][skinIndex]);
                 }
             }
         }
         else {
-            cnvVertex->JointIndices.push_back(0);
-            cnvVertex->Weights.push_back(1.0f);
+            cnvVertex->SkinInfo.JointIndices.push_back(0);
+            cnvVertex->SkinInfo.Weights.push_back(1.0f);
         }
 
         // Strip vertex attributes to only unique values, and set the vertex indices to match
