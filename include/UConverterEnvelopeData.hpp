@@ -3,7 +3,7 @@
 #include "types.hpp"
 
 #include <glm/glm.hpp>
-#include <glm/mat3x4.hpp>
+#include <glm/mat4x4.hpp>
 
 #include <vector>
 
@@ -35,7 +35,7 @@ namespace J3D {
         class UConverterEnvelopeData {
             // EVP1 data
             std::vector<UConverterEnvelope> mEnvelopes;
-            std::vector<glm::mat3x4> mInverseBindMatrices;
+            std::vector<glm::mat4> mInverseBindMatrices;
 
             // DRW1 data
             std::vector<uint16_t> mUnskinnedIndices;

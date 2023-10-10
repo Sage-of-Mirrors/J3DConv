@@ -19,13 +19,13 @@ void J3D::Cnv::UConverterEnvelopeData::ProcessEnvelopes(const std::vector<UConve
     for (UConverterShape* shape : shapes) {
         for (UConverterPrimitive* prim : shape->GetPrimitives()) {
             for (UConverterVertex* v : prim->mVertices) {
-                if (v->JointIndices.size() == 1) {
+                if (v->SkinInfo.JointIndices.size() == 1) {
                     uint16_t jointIndex = UINT16_MAX;
 
-                    const auto itr = std::find(mUnskinnedIndices.begin(), mUnskinnedIndices.end(), v->JointIndices[0]);
+                    const auto itr = std::find(mUnskinnedIndices.begin(), mUnskinnedIndices.end(), v->SkinInfo.JointIndices[0]);
                     if (itr == mUnskinnedIndices.end()) {
                         jointIndex = mUnskinnedIndices.size();
-                        mUnskinnedIndices.push_back(v->JointIndices[0]);
+                        mUnskinnedIndices.push_back(v->SkinInfo.JointIndices[0]);
                     }
                     else {
                         jointIndex = itr - mUnskinnedIndices.begin();
@@ -41,8 +41,8 @@ void J3D::Cnv::UConverterEnvelopeData::ProcessEnvelopes(const std::vector<UConve
     for (UConverterShape* shape : shapes) {
         for (UConverterPrimitive* prim : shape->GetPrimitives()) {
             for (UConverterVertex* v : prim->mVertices) {
-                if (v->JointIndices.size() != 1) {
-                    UConverterEnvelope env = { v->JointIndices, v->Weights };
+                if (v->SkinInfo.JointIndices.size() != 1) {
+                    UConverterEnvelope env = { v->SkinInfo.JointIndices, v->SkinInfo.Weights };
                     uint16_t envelopeIndex = UINT16_MAX;
 
                     const auto envelopeItr = std::find(mEnvelopes.begin(), mEnvelopes.end(), env);
@@ -87,22 +87,27 @@ void J3D::Cnv::UConverterEnvelopeData::ReadInverseBindMatrices(const tinygltf::M
     ibmStream.seek(ibmView.byteOffset);
 
     for (uint32_t i = 0; i < ibmAccessor.count; i++) {
-        glm::mat3x4 ibm;
+        glm::mat4 ibm;
 
         ibm[0][0] = ibmStream.readFloat();
-        ibm[0][1] = ibmStream.readFloat();
-        ibm[0][2] = ibmStream.readFloat();
-        ibm[0][3] = ibmStream.readFloat();
-
         ibm[1][0] = ibmStream.readFloat();
-        ibm[1][1] = ibmStream.readFloat();
-        ibm[1][2] = ibmStream.readFloat();
-        ibm[1][3] = ibmStream.readFloat();
-
         ibm[2][0] = ibmStream.readFloat();
+        ibm[3][0] = ibmStream.readFloat();
+
+        ibm[0][1] = ibmStream.readFloat();
+        ibm[1][1] = ibmStream.readFloat();
         ibm[2][1] = ibmStream.readFloat();
+        ibm[3][1] = ibmStream.readFloat();
+
+        ibm[0][2] = ibmStream.readFloat();
+        ibm[1][2] = ibmStream.readFloat();
         ibm[2][2] = ibmStream.readFloat();
+        ibm[3][2] = ibmStream.readFloat();
+
+        ibm[0][3] = ibmStream.readFloat();
+        ibm[1][3] = ibmStream.readFloat();
         ibm[2][3] = ibmStream.readFloat();
+        ibm[3][3] = ibmStream.readFloat();
 
         mInverseBindMatrices.push_back(ibm);
     }
